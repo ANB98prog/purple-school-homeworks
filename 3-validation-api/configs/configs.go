@@ -3,6 +3,7 @@ package configs
 import (
 	"github.com/joho/godotenv"
 	"log"
+	"os"
 )
 
 type Config struct {
@@ -12,26 +13,15 @@ type Config struct {
 }
 
 type EmailConfig struct {
-	Auth              EmailAuthConfig
-	EmailVerification EmailVerificationConfig
-}
-
-type EmailAuthConfig struct {
-	Username string
-	Password string
-	Host     string
-}
-
-type EmailVerificationConfig struct {
-	From    string
-	Subject string
-	Text    string
+	Email string
 }
 
 type PasswordConfig struct {
+	Password string
 }
 
 type AddressConfig struct {
+	Address string
 }
 
 func LoadConfig() *Config {
@@ -41,8 +31,8 @@ func LoadConfig() *Config {
 	}
 
 	return &Config{
-		Email:    EmailConfig{},
-		Password: PasswordConfig{},
-		Address:  AddressConfig{},
+		Email:    EmailConfig{Email: os.Getenv("EMAIL")},
+		Password: PasswordConfig{Password: os.Getenv("PASSWORD")},
+		Address:  AddressConfig{Address: os.Getenv("ADDRESS")},
 	}
 }
