@@ -7,32 +7,38 @@ import (
 )
 
 type Config struct {
-	Email    EmailConfig
-	Password PasswordConfig
-	Address  AddressConfig
+	EmailSender EmailSenderConfig
 }
 
-type EmailConfig struct {
-	Email string
+type EmailSenderConfig struct {
+	From       string
+	ApiAddress string
+	SmtpAuth   SmtpConfig
 }
 
-type PasswordConfig struct {
+type SmtpConfig struct {
+	Login    string
 	Password string
-}
-
-type AddressConfig struct {
-	Address string
+	Host     string
+	Port     string
 }
 
 func LoadConfig() *Config {
 	err := godotenv.Load()
 	if err != nil {
-		log.Println("Error loading .env file, using default config")
+		log.Printf("Error loading .env file, using default config. Error %s\n", err)
 	}
 
 	return &Config{
-		Email:    EmailConfig{Email: os.Getenv("EMAIL")},
-		Password: PasswordConfig{Password: os.Getenv("PASSWORD")},
-		Address:  AddressConfig{Address: os.Getenv("ADDRESS")},
+		EmailSender: EmailSenderConfig{
+			From:       os.Getenv("from"),
+			ApiAddress: os.Getenv("api_address"),
+			SmtpAuth: SmtpConfig{
+				Login:    os.Getenv("smtp_login"),
+				Password: os.Getenv("smtp_password"),
+				Host:     os.Getenv("smtp_host"),
+				Port:     os.Getenv("smtp_port"),
+			},
+		},
 	}
 }
