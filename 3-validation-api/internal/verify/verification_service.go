@@ -10,7 +10,6 @@ import (
 	"hash/fnv"
 	"net/smtp"
 	"os"
-	"strings"
 )
 
 type VerificationService interface {
@@ -64,12 +63,7 @@ func (sender *EmailVerificationService) SendVerification(emailAddress string) er
 }
 
 func auth(config configs.EmailSenderConfig) (smtp.Auth, error) {
-	values := strings.Split(config.From, "@")
-	if len(values) != 2 {
-		return nil, fmt.Errorf("invalid email format: %s", config.From)
-	}
-	username := values[0]
-	auth := smtp.PlainAuth("", username, config.SmtpAuth.Password, config.SmtpAuth.Host)
+	auth := smtp.PlainAuth("", config.SmtpAuth.Login, config.SmtpAuth.Password, config.SmtpAuth.Host)
 
 	return auth, nil
 }
@@ -125,7 +119,7 @@ func isCorrectVerification(hash string) bool {
 }
 
 func getVerifications() (EmailVerificationItems, error) {
-	file, err := os.OpenFile(fileName, os.O_RDONLY, os.ModePerm)
+	file, err := os.OpenFile(fileName, os.O_RDWR|os.O_CREATE, os.ModePerm)
 	if err != nil {
 		return EmailVerificationItems{}, err
 	}
