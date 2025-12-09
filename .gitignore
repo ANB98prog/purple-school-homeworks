@@ -1,3 +1,5 @@
 .env
 ./4-order-api/order-api-postgres-data
 ./4-order-api/.env.Development
+*.xml
+*.iml
