@@ -44,7 +44,7 @@ func (repo *PgProductRepository) Delete(id uint) error {
 
 func (repo *PgProductRepository) GetById(id uint) (*Product, error) {
 	var product Product
-	result := repo.DB.First(product, id)
+	result := repo.DB.First(&product, id)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			return nil, productErrors.ErrProductNotFound
