@@ -1,4 +1,4 @@
-package auth
+package service
 
 type AuthCode struct {
 	SessionId string `json:"sessionId"`

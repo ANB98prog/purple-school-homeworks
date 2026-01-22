@@ -1,24 +1,31 @@
-package auth
+package service
 
 import (
-	"github.com/ANB98prog/purple-school-homeworks/4-order-api/pkg/helpers/auth"
+	helper "github.com/ANB98prog/purple-school-homeworks/4-order-api/pkg/helpers/auth"
 	"github.com/ANB98prog/purple-school-homeworks/4-order-api/pkg/helpers/file"
 )
 
 const codesFileName = "authCodes.json"
 
-type AuthCodeService struct {
+type AuthCodeService interface {
+	GenerateAuthCode(phone string) (AuthCode, error)
+	GetAuthCode(sessionId string) (AuthCode, bool)
+	DeleteAuthCode(sessionId string) error
 }
 
-func NewAuthService() *AuthCodeService {
-	return new(AuthCodeService)
+type authCodeService struct{}
+
+func NewAuthCodeService() AuthCodeService {
+	return &authCodeService{}
 }
 
-func (service *AuthCodeService) GenerateAuthCode(phone string) (AuthCode, error) {
+var _ AuthCodeService = (*authCodeService)(nil) // assertion
+
+func (service *authCodeService) GenerateAuthCode(phone string) (AuthCode, error) {
 
 	// Генерируем код и сессию
-	code := auth.GenerateAuthCode()
-	sessionId := auth.GenerateSessionId()
+	code := helper.GenerateAuthCode()
+	sessionId := helper.GenerateSessionId()
 
 	// Читаем из файла коды
 	authCodes, err := getCodesFromFile()
@@ -39,7 +46,7 @@ func (service *AuthCodeService) GenerateAuthCode(phone string) (AuthCode, error)
 	return authCode, nil
 }
 
-func (service *AuthCodeService) GetAuthCode(sessionId string) (AuthCode, bool) {
+func (service *authCodeService) GetAuthCode(sessionId string) (AuthCode, bool) {
 	// Достаем коды из файла
 	authCodes, err := getCodesFromFile()
 	if err != nil {
@@ -55,7 +62,7 @@ func (service *AuthCodeService) GetAuthCode(sessionId string) (AuthCode, bool) {
 	return authSession, true
 }
 
-func (service *AuthCodeService) DeleteAuthCode(sessionId string) error {
+func (service *authCodeService) DeleteAuthCode(sessionId string) error {
 	// Достаем коды из файла
 	authCodes, err := getCodesFromFile()
 	if err != nil {

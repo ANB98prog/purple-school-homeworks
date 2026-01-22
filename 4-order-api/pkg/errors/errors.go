@@ -1,0 +1,10 @@
+package errors
+
+// ItemNotFound - ошибка возвращаемая при ненайденной сущности
+type ItemNotFound struct {
+	Message string `json:"message"`
+}
+
+func (item *ItemNotFound) Error() string {
+	return item.Message
+}

@@ -1,8 +1,9 @@
-package auth
+package handler
 
 import (
 	"fmt"
 	"github.com/ANB98prog/purple-school-homeworks/3-validation-api/pkg/response"
+	"github.com/ANB98prog/purple-school-homeworks/4-order-api/internal/service"
 	"github.com/ANB98prog/purple-school-homeworks/4-order-api/pkg/jwt"
 	"github.com/ANB98prog/purple-school-homeworks/4-order-api/pkg/request"
 	"log"
@@ -10,11 +11,11 @@ import (
 )
 
 type AuthHandler struct {
-	authService *AuthCodeService
+	authService service.AuthCodeService
 	jwt         *jwt.JWT
 }
 
-func NewAuthHandler(router *http.ServeMux, authService *AuthCodeService, jwt *jwt.JWT) {
+func NewAuthHandler(router *http.ServeMux, authService service.AuthCodeService, jwt *jwt.JWT) {
 	handler := &AuthHandler{
 		authService: authService,
 		jwt:         jwt,
