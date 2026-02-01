@@ -1,3 +1,6 @@
 package service
 
-type User struct{}
+type User struct {
+	Id    uint
+	Phone string
+}

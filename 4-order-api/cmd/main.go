@@ -4,8 +4,10 @@ import (
 	"fmt"
 	"github.com/ANB98prog/purple-school-homeworks/4-order-api/configs"
 	"github.com/ANB98prog/purple-school-homeworks/4-order-api/internal/handler"
+	"github.com/ANB98prog/purple-school-homeworks/4-order-api/internal/repository"
 	"github.com/ANB98prog/purple-school-homeworks/4-order-api/internal/service"
 	"github.com/ANB98prog/purple-school-homeworks/4-order-api/pkg/cache"
+	"github.com/ANB98prog/purple-school-homeworks/4-order-api/pkg/db"
 	"github.com/ANB98prog/purple-school-homeworks/4-order-api/pkg/jwt"
 	"github.com/ANB98prog/purple-school-homeworks/4-order-api/pkg/logging"
 	"github.com/ANB98prog/purple-school-homeworks/4-order-api/pkg/middlewares"
@@ -25,19 +27,28 @@ func main() {
 	router := http.NewServeMux()
 
 	// Databases
-	//connection := db.NewDb(&conf.Db)
+	dbConnection := db.NewDb(&conf.Db)
 	redisClient := cache.NewRedisClient(&conf.Cache)
 
 	// Repositories
+	authCodeRepo := repository.NewRedisAuthCodeRepository(redisClient)
+	userRepo := repository.NewUserRepository(dbConnection)
 
 	// Services
-	authService := service.NewAuthCodeService()
+	authCodeService := service.NewAuthCodeService(authCodeRepo)
+	userService := service.NewUserService(userRepo)
 
 	// JWT
 	j := jwt.NewJWT(conf.Auth.Secret)
 
 	// Handlers
-	handler.NewAuthHandler(router, authService, j)
+	authHandlerDeps := handler.AuthHandlerDeps{
+		UserService:     userService,
+		AuthCodeService: authCodeService,
+		JWT:             j,
+	}
+
+	handler.NewAuthHandler(router, authHandlerDeps)
 	handler.NewProductHandler(router, conf)
 
 	stack := middlewares.Chain(middlewares.Logging)

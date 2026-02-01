@@ -1,31 +1,60 @@
 package repository
 
-import "gorm.io/gorm"
+import (
+	goerr "errors"
+	"github.com/ANB98prog/purple-school-homeworks/4-order-api/pkg/db"
+	"github.com/ANB98prog/purple-school-homeworks/4-order-api/pkg/errors"
+	"gorm.io/gorm"
+)
 
 type UserRepository interface {
-	Create(user User) (User, error)
-	GetById(id uint) (User, error)
-	GetByPhone(id uint) (User, error)
+	Create(phone string) (*User, error)
+	GetById(id uint) (*User, error)
+	GetByPhone(phone string) (*User, error)
 }
 
 type userRepository struct {
-	db *gorm.DB
+	db *db.Db
 }
 
-func NewUserRepository(db *gorm.DB) UserRepository {
+func NewUserRepository(db *db.Db) UserRepository {
 	return &userRepository{db: db}
 }
 
 var _ UserRepository = (*userRepository)(nil)
 
-func (userRepository *userRepository) Create(user User) (User, error) {
-	return User{}, nil
+func (repo *userRepository) Create(phone string) (*User, error) {
+	dbUser := User{Phone: phone}
+	result := repo.db.Create(&dbUser)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return &dbUser, nil
 }
 
-func (userRepository *userRepository) GetById(id uint) (User, error) {
-	return User{}, nil
+func (repo *userRepository) GetById(id uint) (*User, error) {
+	var user User
+	result := repo.db.Take(&user, id)
+	if result.Error != nil {
+		if goerr.Is(result.Error, gorm.ErrRecordNotFound) {
+			return nil, errors.ErrUserNotFound
+		}
+		return nil, result.Error
+	}
+
+	return &user, nil
 }
 
-func (userRepository *userRepository) GetByPhone(id uint) (User, error) {
-	return User{}, nil
+func (repo *userRepository) GetByPhone(phone string) (*User, error) {
+	var user User
+	result := repo.db.Where("phone = ?", phone).First(&user)
+	if result.Error != nil {
+		if goerr.Is(result.Error, gorm.ErrRecordNotFound) {
+			return nil, errors.ErrUserNotFound
+		}
+		return nil, result.Error
+	}
+
+	return &user, nil
 }
