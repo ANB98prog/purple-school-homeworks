@@ -9,3 +9,14 @@ type OrderItem struct {
 	Quantity  uint
 	Price     float64
 }
+
+type OrderItems []OrderItem
+
+func (items OrderItems) GetProductIds() []uint {
+	ids := make([]uint, len(items))
+	for i, item := range items {
+		ids[i] = item.Product.ID
+	}
+
+	return ids
+}

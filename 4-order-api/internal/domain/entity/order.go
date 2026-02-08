@@ -10,5 +10,5 @@ type Order struct {
 	User   User      `gorm:"foreignKey:UserID"` // BelongsTo User
 	Date   time.Time `gorm:"default:CURRENT_TIMESTAMP"`
 	Total  float64
-	Items  []OrderItem `gorm:"foreignKey:OrderID"` // One-to-Many к OrderItem
+	Items  OrderItems `gorm:"foreignKey:OrderID"` // One-to-Many к OrderItem
 }

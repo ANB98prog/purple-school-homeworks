@@ -1,6 +1,8 @@
 package errors
 
-import "errors"
+import (
+	"errors"
+)
 
 // ItemNotFound - ошибка возвращаемая при ненайденной сущности
 type ItemNotFound struct {
@@ -9,6 +11,16 @@ type ItemNotFound struct {
 
 func (item *ItemNotFound) Error() string {
 	return item.Message
+}
+
+func (item *ItemNotFound) Is(target error) bool {
+	var itemNotFound *ItemNotFound
+	ok := errors.As(target, &itemNotFound)
+	return ok
+}
+
+func NewItemNotFound(message string) *ItemNotFound {
+	return &ItemNotFound{Message: message}
 }
 
 var (

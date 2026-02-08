@@ -33,10 +33,13 @@ func main() {
 	// Repositories
 	authCodeRepo := repository.NewRedisAuthCodeRepository(redisClient)
 	userRepo := repository.NewUserRepository(dbConnection)
+	productRepo := repository.NewProductRepository(dbConnection)
+	orderRepo := repository.NewOrderRepository(dbConnection)
 
 	// Services
 	authCodeService := service.NewAuthCodeService(authCodeRepo)
 	userService := service.NewUserService(userRepo)
+	orderService := service.NewOrderService(orderRepo, productRepo, userRepo)
 
 	// JWT
 	j := jwt.NewJWT(conf.Auth.Secret)
@@ -47,9 +50,13 @@ func main() {
 		AuthCodeService: authCodeService,
 		JWT:             j,
 	}
+	orderHandlerDeps := handler.OrderHandlerDeps{
+		OrderService: orderService,
+	}
 
 	handler.NewAuthHandler(router, authHandlerDeps)
 	handler.NewProductHandler(router, conf)
+	handler.NewOrderHandler(router, orderHandlerDeps, conf)
 
 	stack := middlewares.Chain(middlewares.Logging)
 

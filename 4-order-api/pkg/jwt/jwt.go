@@ -5,6 +5,12 @@ import (
 	"strconv"
 )
 
+const (
+	SessionIdKey = "sessionId"
+	UserPhoneKey = "phone"
+	UserIdKey    = "userId"
+)
+
 // JWT - содержит данные для создания JWT токена
 type JWT struct {
 	secret string
@@ -24,9 +30,9 @@ func NewJWT(secret string) *JWT {
 // Create - Создает jwt токен
 func (j *JWT) Create(sessionId, phone string, userId uint) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"sessionId": sessionId,
-		"phone":     phone,
-		"userId":    userId,
+		SessionIdKey: sessionId,
+		UserPhoneKey: phone,
+		UserIdKey:    strconv.Itoa(int(userId)),
 	})
 
 	s, err := token.SignedString([]byte(j.secret))
@@ -44,15 +50,15 @@ func (j *JWT) Parse(tokenString string) (*JWTData, bool) {
 	if err != nil {
 		return nil, false
 	}
-	sessionId, ok := GetClaim("sessionId", token)
+	sessionId, ok := GetClaim(SessionIdKey, token)
 	if !ok {
 		return nil, false
 	}
-	phone, ok := GetClaim("phone", token)
+	phone, ok := GetClaim(UserPhoneKey, token)
 	if !ok {
 		return nil, false
 	}
-	userIdStr, ok := GetClaim("userId", token)
+	userIdStr, ok := GetClaim(UserIdKey, token)
 	if !ok {
 		return nil, false
 	}
